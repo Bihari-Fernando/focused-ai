@@ -51,6 +51,39 @@ export default function Home() {
             <br />
             <span className="inline-block mt-2 bg-gradient-to-b from-foreground to-foreground/90 bg-clip-text text-transparent">Stay Calm & Focused</span>
           </h1>
+          <p className="max-w-[600px] mx-auto text-base md:text-lg text-muted-foreground leading-relaxed tracking-wide">
+            Experience a supportive way to manage exam stress. Our AI companion listens, understands your feelings, and gently guides you toward calmness and focus during exam preparation.
+          </p>
+
+          <motion.div className="w-full max-w-[600px] mx-auto space-y-6 py-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: mounted ? 1 : 0, y: mounted ? 0 : 20 }}
+            transition={{ delay: 0.3, duration: 0.8 }}>
+            <div className="space-y-2 text=center">
+              <p className="text-sm text-muted-foreground/80 font-medium">
+                Feeling stressed about exams? Our AI companion is here for you
+              </p>
+
+              <div className="flex justify-between items-center px-2">
+                {emotions.map((em) => (
+                  <div
+                  key={em.value}
+                  className={`transition-all duration-500 ease-out cursor-pointer hover:scale-105 ${Math.abs(emotion - em.value) < 15 ? "opacity-100 scale-110 transform-gpu" : "opacity-50 scale-100"}`}
+                  onClick={() => setEmotion(em.value)}
+                  >
+                    <div className="text-2xl transform-gpu">
+                      {em.lable.split(" ")[0]}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1 font-medium">
+                      {em.lable.split(" ")[1]}
+                    </div>
+                  </div>
+                ))
+
+                }
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
       </section>
     </div>
