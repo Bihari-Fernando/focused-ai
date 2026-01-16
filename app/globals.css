@@ -1,25 +1,169 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  /* Light mode */
-  --background: #f5f7fb;
-  --foreground: #0f172a;
+/* =========================
+   DESIGN TOKENS (THEME)
+========================= */
+@layer base {
+  :root {
+    --background: 180 20% 99%;
+    --foreground: 200 8% 24%;
 
-  --primary: #2563eb;        /* Blue-600 */
-  --primary-soft: #3b82f6;   /* Blue-500 */
+    --card: 180 20% 99%;
+    --card-foreground: 200 8% 24%;
+
+    --popover: 180 20% 99%;
+    --popover-foreground: 200 8% 24%;
+
+    --primary: 220 90% 56%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 30% 96%;
+    --secondary-foreground: 215 25% 30%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 45%;
+
+    --accent: 180 25% 95%;
+    --accent-foreground: 200 8% 24%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 200 10% 90%;
+    --input: 200 10% 90%;
+    --ring: 150 30% 60%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 200 50% 3%;
+    --foreground: 210 20% 98%;
+
+    --card: 200 50% 3%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 200 50% 3%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 220 90% 65%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 215 35% 18%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 200 50% 10%;
+    --muted-foreground: 210 20% 70%;
+
+    --accent: 200 50% 10%;
+    --accent-foreground: 210 20% 98%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 200 50% 10%;
+    --input: 200 50% 10%;
+    --ring: 150 30% 70%;
+  }
 }
 
-.dark {
-  /* Dark mode */
-  --background: #020617;
-  --foreground: #e5e7eb;
+/* =========================
+   BASE STYLES
+========================= */
+@layer base {
+  * {
+    @apply border-border transition-colors duration-200;
+  }
 
-  --primary: #60a5fa;        /* Blue-400 */
-  --primary-soft: #3b82f6;   /* Blue-500 */
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* =========================
+   ANIMATIONS & EFFECTS
+========================= */
+.hover-lift {
+  @apply transition-transform duration-300;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+}
+
+.gentle-shadow {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.gentle-shadow:hover {
+  box-shadow: 0 8px 30px -2px rgba(0, 0, 0, 0.15);
+}
+
+/* Keyframes */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+@keyframes scroll {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse-gentle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Utility animations */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-wave {
+  animation: wave 2s ease-in-out infinite;
+}
+
+.animate-scroll {
+  animation: scroll 2s ease-in-out infinite;
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 2s ease-in-out infinite;
+}
+
+.gradient-animation {
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+/* =========================
+   EXTRA UTILITIES
+========================= */
+@layer utilities {
+  .bg-size-200 {
+    background-size: 200% 100%;
+  }
+
+  .bg-pos-0 {
+    background-position: 0% 0%;
+  }
+
+  .bg-pos-100 {
+    background-position: 100% 0%;
+  }
 }
