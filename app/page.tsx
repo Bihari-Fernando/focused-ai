@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Ripple } from "@/components/ui/ripple"
 import { motion } from 'framer-motion'
 import { Waves } from "lucide-react";
+import { Slider } from "@/components/ui/slider"
 
 export default function Home() {
   const emotions = [
@@ -82,6 +83,26 @@ export default function Home() {
 
                 }
               </div>
+            </div>
+            
+            {/* Slider */}
+            <div className="relative px-2">
+              <div
+              className={`absolute unnset-0 bg-gradient-to-r ${currentEmotion.color} to-transparent blur-2xl -z-10 transition-all duration-500`}
+              />
+              <Slider
+              value={[emotion]}
+              onValueChange={(value) => setEmotion(value[0])}
+              min={0}
+              max={100}
+              step={1}
+              className="py-4"
+              />
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground animate-pulse">
+              Slide to share how you’re feeling about your studies today
+              </p>
             </div>
           </motion.div>
         </motion.div>
