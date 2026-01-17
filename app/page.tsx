@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Ripple } from "@/components/ui/ripple"
 import { motion } from 'framer-motion'
-import { Waves } from "lucide-react";
+import { ArrowRight, Waves } from "lucide-react";
 import { Slider } from "@/components/ui/slider"
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const emotions = [
@@ -68,9 +69,9 @@ export default function Home() {
               <div className="flex justify-between items-center px-2">
                 {emotions.map((em) => (
                   <div
-                  key={em.value}
-                  className={`transition-all duration-500 ease-out cursor-pointer hover:scale-105 ${Math.abs(emotion - em.value) < 15 ? "opacity-100 scale-110 transform-gpu" : "opacity-50 scale-100"}`}
-                  onClick={() => setEmotion(em.value)}
+                    key={em.value}
+                    className={`transition-all duration-500 ease-out cursor-pointer hover:scale-105 ${Math.abs(emotion - em.value) < 15 ? "opacity-100 scale-110 transform-gpu" : "opacity-50 scale-100"}`}
+                    onClick={() => setEmotion(em.value)}
                   >
                     <div className="text-2xl transform-gpu">
                       {em.lable.split(" ")[0]}
@@ -84,26 +85,45 @@ export default function Home() {
                 }
               </div>
             </div>
-            
+
             {/* Slider */}
             <div className="relative px-2">
               <div
-              className={`absolute unnset-0 bg-gradient-to-r ${currentEmotion.color} to-transparent blur-2xl -z-10 transition-all duration-500`}
+                className={`absolute unnset-0 bg-gradient-to-r ${currentEmotion.color} to-transparent blur-2xl -z-10 transition-all duration-500`}
               />
               <Slider
-              value={[emotion]}
-              onValueChange={(value) => setEmotion(value[0])}
-              min={0}
-              max={100}
-              step={1}
-              className="py-4"
+                value={[emotion]}
+                onValueChange={(value) => setEmotion(value[0])}
+                min={0}
+                max={100}
+                step={1}
+                className="py-4"
               />
             </div>
             <div className="text-center">
               <p className="text-sm text-muted-foreground animate-pulse">
-              Slide to share how you’re feeling about your studies today
+                Slide to share how you’re feeling about your studies today
               </p>
             </div>
+
+            {/*  */}
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: mounted ? 1 : 0, y: mounted ? 0 : 20 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+            >
+              <Button
+                size="lg"
+                className="relative group h-12 px-8 rounded-full bg-gradient-to-r from-primary via-primary/90 to-secondary hover:to-primary shadow-lg shadow-primary/20 transition-all duration-500 hover:shadow-xl hover:shadow-primary/30"
+              >
+                <span className="relative z-10 font-medium flex items-center gap-2">
+                  Start Your Calm Journey
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                </span>
+              </Button>
+
+            </motion.div>
           </motion.div>
         </motion.div>
       </section>
