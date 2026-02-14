@@ -119,7 +119,7 @@ export default function LoginPage() {
           <div className="flex flex-col items-center gap-2">
             <div className="flex items-center justify-center gap-2 text-sm">
               <span className="text-muted-foreground">
-                Don&apos;t have an account?
+                Don't have an account?
               </span>
               <Link
                 href="/signup"
