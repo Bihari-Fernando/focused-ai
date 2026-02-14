@@ -13,6 +13,16 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -55,6 +65,7 @@ export default function dashboardPage() {
     ];
 
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [showMoodModal, setShowMoodModal] = useState(false);
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -221,10 +232,28 @@ export default function dashboardPage() {
                             </CardContent>
 
                         </Card>
-
                     </div>
+
+                    {/* content grid for games */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-3 space-y-6">
+                            {/* anxiety games */}
+                        </div>
+                    </div>
+
+
                 </div>
             </Container>
+            <Dialog open={showMoodModal} onOpenChange={setShowMoodModal}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>How are exams making you feel?</DialogTitle>
+                        <DialogDescription>
+                            Slide to tell us your current stress level
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
 
         </div>
     )
