@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Container } from "@/components/ui/container";
 import { motion } from "framer-motion";
+import { MessageSquare } from "lucide-react";
 import {
     Card,
     CardAction,
@@ -71,8 +72,19 @@ export default function dashboardPage() {
                                             )}
                                             onClick={() => { }}
                                         >
-                                            {/* Add your button content here */}
-                                            Do Something
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                                                    <MessageSquare className="w-4 h-4 text-white" />
+                                                </div>
+                                                <div className="text-left">
+                                                    <div className="font-semibold text-white">
+                                                        Start Therapy
+                                                    </div>
+                                                    <div className="text-xs text-white/80">
+                                                        Begin a new session
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </Button>
                                     </div>
                                 </div>
