@@ -18,6 +18,46 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function dashboardPage() {
+
+    const wellnessStats = [
+        {
+          title: "Stress Level",
+          value: dailyStats.stressScore
+            ? `${dailyStats.stressScore}%`
+            : "No data",
+          icon: Brain,
+          color: "text-purple-500",
+          bgColor: "bg-purple-500/10",
+          description: "AI detected stress intensity",
+        },
+        {
+          title: "Mood Score",
+          value: dailyStats.moodScore
+            ? `${dailyStats.moodScore}%`
+            : "No data",
+          icon: Heart,
+          color: "text-rose-500",
+          bgColor: "bg-rose-500/10",
+          description: "Today's emotional state",
+        },
+        {
+          title: "Check-ins",
+          value: `${dailyStats.checkInCount || 0}`,
+          icon: Activity,
+          color: "text-blue-500",
+          bgColor: "bg-blue-500/10",
+          description: "AI stress assessments today",
+        },
+        {
+          title: "Focus Sessions",
+          value: `${dailyStats.focusSessions || 0}`,
+          icon: Trophy,
+          color: "text-yellow-500",
+          bgColor: "bg-yellow-500/10",
+          description: "Exam study sessions completed",
+        },
+      ];
+      
     const [currentTime, setCurrentTime] = useState(new Date());
 
     useEffect(() => {
@@ -136,6 +176,9 @@ export default function dashboardPage() {
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {/* overview card */}
+
                     </div>
                 </div>
             </Container>
