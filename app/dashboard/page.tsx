@@ -189,10 +189,36 @@ export default function dashboardPage() {
                                         size="icon"
                                         className="h-8 w-8"
                                     >
-                    
+
                                     </Button>
                                 </div>
                             </CardHeader>
+
+                            <CardContent>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {wellnessStats.map((stat) => (
+                                        <div
+                                            key={stat.title}
+                                            className={cn(
+                                                "p-4 rounded-lg transition-all duration-200 hover:scale-[1.02]",
+                                                stat.bgColor
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <stat.icon className={cn("w-5 h-5", stat.color)} />
+                                                <p className="text-sm font-medium">{stat.title}</p>
+                                            </div>
+                                            <p className="text-2xl font-bold mt-2">{stat.value}</p>
+                                            <p className="text-sm text-muted-foreground mt-1">
+                                                {stat.description}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="mt-4 text-xs text-muted-foreground text-right">
+                                    Last updated: {format(new Date(), "h:mm a")}
+                                </div>
+                            </CardContent>
 
                         </Card>
 
