@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { Container } from "@/components/ui/container";
 import { motion } from "framer-motion";
-import { MessageSquare, ArrowRight, Heart, BrainCircuit } from "lucide-react";
-
+import { MessageSquare, ArrowRight, Heart, BrainCircuit, Brain, Activity, Trophy } from "lucide-react";
+import { format } from "date-fns";
 import {
     Card,
     CardAction,
@@ -21,43 +21,39 @@ export default function dashboardPage() {
 
     const wellnessStats = [
         {
-          title: "Stress Level",
-          value: dailyStats.stressScore
-            ? `${dailyStats.stressScore}%`
-            : "No data",
-          icon: Brain,
-          color: "text-purple-500",
-          bgColor: "bg-purple-500/10",
-          description: "AI detected stress intensity",
+            title: "Stress Level",
+            value: "65%",
+            icon: Brain,
+            color: "text-purple-500",
+            bgColor: "bg-purple-500/10",
+            description: "AI detected exam stress",
         },
         {
-          title: "Mood Score",
-          value: dailyStats.moodScore
-            ? `${dailyStats.moodScore}%`
-            : "No data",
-          icon: Heart,
-          color: "text-rose-500",
-          bgColor: "bg-rose-500/10",
-          description: "Today's emotional state",
+            title: "Mood Score",
+            value: "72%",
+            icon: Heart,
+            color: "text-rose-500",
+            bgColor: "bg-rose-500/10",
+            description: "Today's emotional state",
         },
         {
-          title: "Check-ins",
-          value: `${dailyStats.checkInCount || 0}`,
-          icon: Activity,
-          color: "text-blue-500",
-          bgColor: "bg-blue-500/10",
-          description: "AI stress assessments today",
+            title: "AI Check-ins",
+            value: "3",
+            icon: Activity,
+            color: "text-blue-500",
+            bgColor: "bg-blue-500/10",
+            description: "Conversations with AI today",
         },
         {
-          title: "Focus Sessions",
-          value: `${dailyStats.focusSessions || 0}`,
-          icon: Trophy,
-          color: "text-yellow-500",
-          bgColor: "bg-yellow-500/10",
-          description: "Exam study sessions completed",
+            title: "Focus Sessions",
+            value: "2",
+            icon: Trophy,
+            color: "text-yellow-500",
+            bgColor: "bg-yellow-500/10",
+            description: "Study sessions completed",
         },
-      ];
-      
+    ];
+
     const [currentTime, setCurrentTime] = useState(new Date());
 
     useEffect(() => {
@@ -178,6 +174,27 @@ export default function dashboardPage() {
                         </Card>
 
                         {/* overview card */}
+                        <Card className="border-primary/10">
+                            <CardHeader>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <CardTitle>Today's Overview</CardTitle>
+                                        <CardDescription>
+                                            Your stress metrics for{" "}
+                                            {format(new Date(), "MMMM d, yyyy")}
+                                        </CardDescription>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                    >
+                    
+                                    </Button>
+                                </div>
+                            </CardHeader>
+
+                        </Card>
 
                     </div>
                 </div>
