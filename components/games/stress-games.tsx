@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { QuickCalmBreathing } from "./quickcalm-breathing";
 import FocusBooster from "./focus-booster";
 import { StressReset } from "./stress-reset";
+import ConfidenceBuilder from "./confidence-builder";
 
 const games = [
     {
@@ -103,7 +104,7 @@ export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
             return <StressReset />;
 
             case "confidence":
-            //return <ConfidenceBuilder />;
+        return <ConfidenceBuilder />;
 
             default:
                 return null;
