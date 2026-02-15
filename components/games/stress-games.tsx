@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog"
 
 import { Button } from "@/components/ui/button";
+import { QuickCalmBreathing } from "./quickcalm-breathing";
 
 const games = [
     {
@@ -91,7 +92,7 @@ export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
     const renderGame = () => {
         switch (selectedGame) {
             case "breathing":
-            //return <QuickCalmBreathing />;
+            return <QuickCalmBreathing/>
 
             case "focus":
             //return <FocusBooster />;
