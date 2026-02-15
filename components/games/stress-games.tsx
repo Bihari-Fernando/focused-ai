@@ -167,6 +167,17 @@ export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
                     )}
                 </CardContent>
             </Card>
+
+            <Dialog open={showGame} onOpenChange={setShowGame}>
+                <DialogContent className="sm:max-w-[600px]">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {games.find((g) => g.id === selectedGame)?.title}
+                        </DialogTitle>
+                    </DialogHeader>
+                    {renderGame()}
+                </DialogContent>
+            </Dialog>
         </>
     );
 
