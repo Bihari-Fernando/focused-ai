@@ -66,3 +66,28 @@ const games = [
   interface AnxietyGamesProps {
     onGamePlayed?: (gameName: string, description: string) => Promise<void>;
   }
+
+  export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
+    const [selectedGame, setSelectedGame] = useState<string | null>(null);
+    const [showGame, setShowGame] = useState(false);
+
+    const handleGameStart = async (gameId: string) => {
+        setSelectedGame(gameId);
+        setShowGame(true);
+    
+        // Log the activity
+        if (onGamePlayed) {
+          try {
+            await onGamePlayed(
+              gameId,
+              games.find((g) => g.id === gameId)?.description || ""
+            );
+          } catch (error) {
+            console.error("Error logging game activity:", error);
+          }
+        }
+      };
+
+  }    
+
+
