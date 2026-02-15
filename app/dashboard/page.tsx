@@ -26,6 +26,7 @@ import {
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AnxietyGames } from "@/components/games/stress-games";
 
 export default function dashboardPage() {
 
@@ -238,6 +239,7 @@ export default function dashboardPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-3 space-y-6">
                             {/* anxiety games */}
+                            <AnxietyGames/>
                         </div>
                     </div>
 
@@ -254,6 +256,8 @@ export default function dashboardPage() {
                     </DialogHeader>
                 </DialogContent>
             </Dialog>
+
+            {/* activity logger */}
 
         </div>
     )
