@@ -60,6 +60,12 @@ export function QuickCalmBreathing() {
         return () => clearInterval(timer);
     }, [phase, round, isComplete, isPaused]);
 
-    
+    const handleReset = () => {
+        setPhase("inhale");
+        setProgress(0);
+        setRound(1);
+        setIsComplete(false);
+        setIsPaused(false);
+    };
 
 };
