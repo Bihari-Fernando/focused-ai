@@ -119,6 +119,45 @@ export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
                         Interactive exercises to help reduce stress and anxiety
                     </CardDescription>
                 </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {games.map((game) => (
+                            <motion.div
+                                key={game.id}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <Card
+                                    className={`border-primary/10 hover:bg-primary/5 transition-colors cursor-pointer ${selectedGame === game.id ? "ring-2 ring-primary" : ""
+                                        }`}
+                                    onClick={() => handleGameStart(game.id)}
+                                >
+                                    <CardContent className="p-4">
+                                        <div className="flex items-start gap-4">
+                                            <div
+                                                className={`p-3 rounded-xl ${game.bgColor} ${game.color}`}
+                                            >
+                                                <game.icon className="h-6 w-6" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <h4 className="font-semibold">{game.title}</h4>
+                                                <p className="text-sm text-muted-foreground mt-1">
+                                                    {game.description}
+                                                </p>
+                                                <div className="flex items-center gap-2 mt-3">
+                                                    <Music2 className="h-4 w-4 text-muted-foreground" />
+                                                    <span className="text-sm text-muted-foreground">
+                                                        {game.duration}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </div>
+                </CardContent>
             </Card>
         </>
     );
