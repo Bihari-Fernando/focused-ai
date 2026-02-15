@@ -157,6 +157,14 @@ export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
                             </motion.div>
                         ))}
                     </div>
+                    {selectedGame && (
+                        <div className="mt-6 text-center">
+                            <Button className="gap-2" onClick={() => setSelectedGame(null)}>
+                                <Gamepad2 className="h-4 w-4" />
+                                Start {games.find((g) => g.id === selectedGame)?.title}
+                            </Button>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </>
