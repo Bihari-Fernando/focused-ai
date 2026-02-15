@@ -27,9 +27,12 @@ import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AnxietyGames } from "@/components/games/stress-games";
+import { MoodForm } from "@/components/mood/mood-form";
 
 export default function dashboardPage() {
-
+    const [currentTime, setCurrentTime] = useState(new Date())
+    const [showMoodModal, setShowMoodModal] = useState(false);
+    const [isSavingMood, setIsSavingMood] = useState(false);
     const wellnessStats = [
         {
             title: "Stress Level",
@@ -65,13 +68,22 @@ export default function dashboardPage() {
         },
     ];
 
-    const [currentTime, setCurrentTime] = useState(new Date());
-    const [showMoodModal, setShowMoodModal] = useState(false);
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
+
+    const handleMoodSubmit = async(data: {moodScore: number }) => {
+        setIsSavingMood(true);
+        try {
+            setShowMoodModal(false);
+        } catch (eroor) {
+            console.error("Error saving mood:",error);
+        } finally {
+            setIsSavingMood(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-background p-8">
@@ -254,6 +266,8 @@ export default function dashboardPage() {
                             Slide to tell us your current stress level
                         </DialogDescription>
                     </DialogHeader>
+                    {/* moodform */}
+                    <MoodForm onSubmit={} isLoading={}/>
                 </DialogContent>
             </Dialog>
 
