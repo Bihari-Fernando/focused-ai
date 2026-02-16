@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { AnxietyGames } from "@/components/games/stress-games";
 import { MoodForm } from "@/components/mood/mood-form";
 import { ActivityLogger } from "@/components/activities/activity-logger";
+import { useRouter } from "next/navigation";
 
 export default function dashboardPage() {
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -72,6 +73,8 @@ export default function dashboardPage() {
     ];
 
 
+    const router = useRouter();
+
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
@@ -90,6 +93,10 @@ export default function dashboardPage() {
 
     const handleAICheckIn = () => {
         setShowActivityLogger(true);
+    };
+
+    const handleStartTherapy = () => {
+        router.push("/therapy/new");
     };
 
     return (
@@ -138,7 +145,7 @@ export default function dashboardPage() {
                                                 "bg-gradient-to-r from-primary/90 to primary hover:from-primary/90",
                                                 "transition-all duration-20 group-hover:translate-y-[-2px]"
                                             )}
-                                            onClick={() => {}}
+                                            onClick={handleStartTherapy}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
