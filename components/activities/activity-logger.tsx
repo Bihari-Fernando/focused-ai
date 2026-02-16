@@ -113,6 +113,15 @@ export function ActivityLogger({ open, onOpenChange }
                             placeholder="15"
                         />
                     </div>
+
+                    <div className="space-y-2">
+                        <Label>Description (optional)</Label>
+                        <Input
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="How did it go?"
+                        />
+                    </div>
                 </form>
             </DialogContent>
         </Dialog>
