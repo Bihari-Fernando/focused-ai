@@ -27,6 +27,7 @@ import {
     SelectValue,
   } from "@/components/ui/select"
   import { Label } from "@/components/ui/label"
+  import { Input } from "@/components/ui/input"
 
 const activityTypes = [
     { id: "breathing", name: "Guided Breathing" },
@@ -93,6 +94,14 @@ export function ActivityLogger({open, onOpenChange}
                                 ))}                                
                             </SelectContent>
                         </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Name</Label>
+                        <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Breathing Session, Focus Game, Confidence Practice, etc."
+                        ></Input>
                     </div>
                 </form>
             </DialogContent>
