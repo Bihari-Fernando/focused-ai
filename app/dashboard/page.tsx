@@ -131,7 +131,7 @@ export default function dashboardPage() {
                                                 "bg-gradient-to-r from-primary/90 to primary hover:from-primary/90",
                                                 "transition-all duration-20 group-hover:translate-y-[-2px]"
                                             )}
-                                            onClick={() => { }}
+                                            onClick={() => {}}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
@@ -159,7 +159,7 @@ export default function dashboardPage() {
                                                     "justify-center items-center text-center",
                                                     "transition-all duration-200 group-hover:translate-y-[-2px]"
                                                 )}
-                                                onClick={() => { }}
+                                                onClick={() => setShowMoodModal(true)}
                                             >
                                                 <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center mb-2">
                                                     <Heart className="w-5 h-5 text-rose-500" />
@@ -267,7 +267,7 @@ export default function dashboardPage() {
                         </DialogDescription>
                     </DialogHeader>
                     {/* moodform */}
-                    <MoodForm onSubmit={} isLoading={}/>
+                    <MoodForm onSubmit={handleMoodSubmit} isLoading={isSavingMood}/>
                 </DialogContent>
             </Dialog>
 
