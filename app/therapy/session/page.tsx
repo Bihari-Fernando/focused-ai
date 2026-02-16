@@ -52,8 +52,16 @@ export default function TherapyPage() {
     },[messages,isTyping]);
 
     return (
-        <div className="relative max-w-7xl mx-auto px-2">
-            <div></div>
+        <div className="relative max-w-7xl mx-auto px-4">
+            <div className="flex h-[calc(100vh-4rem)] mt-20 gap-6">
+                <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-background rounded-lg border">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                        <Bot className="w-5 h-5"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
