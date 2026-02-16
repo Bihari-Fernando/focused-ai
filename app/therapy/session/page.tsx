@@ -2,66 +2,138 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Send,Bot,User,Loader2,Sparkles } from "lucide-react";
+import { Send, Bot, User, Loader2, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion,AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
 const glowAnimation = {
     initial: { opacity: 0.5, scale: 1 },
     animate: {
-      opacity: [0.5, 1, 0.5],
-      scale: [1, 1.05, 1],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
+        opacity: [0.5, 1, 0.5],
+        scale: [1, 1.05, 1],
+        transition: {
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+        },
     },
-};   
+};
 
 export default function TherapyPage() {
-    const [message,setMessage] = useState("");
-    const [isTyping,setIsTyping] = useState(false);
-    const [messages,setMessages] = useState<any[]>([]);
-    const [mounted,setMounted] = useState(false);
-    const [isLoading,setIsLoading] = useState(false);
+    const [message, setMessage] = useState("");
+    const [isTyping, setIsTyping] = useState(false);
+    const [messages, setMessages] = useState<any[]>([]);
+    const [mounted, setMounted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [isChatPaused] = useState(false);
 
     useEffect(() => {
         setMounted(true);
-    },[]);
+    }, []);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
-        if(messagesEndRef.current){
+        if (messagesEndRef.current) {
             setTimeout(() => {
                 messages.current?.
-                scrollIntoView({ behaviour:
-                    "smooth"
-                });
-            },100);
+                    scrollIntoView({
+                        behaviour:
+                            "smooth"
+                    });
+            }, 100);
         }
     };
 
     useEffect(() => {
-        if(!isTyping){
+        if (!isTyping) {
             scrollToBottom();
         }
-    },[messages,isTyping]);
+    }, [messages, isTyping]);
 
     return (
-        <div className="relative max-w-7xl mx-auto px-4">
-            <div className="flex h-[calc(100vh-4rem)] mt-20 gap-6">
-                <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-background rounded-lg border">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                        <Bot className="w-5 h-5"/>
-                        </div>
-                    </div>
+        <div className="relative max-w-7xl mx-auto px-4 mt-20">
+          <div className="flex h-[calc(100vh-4rem)]">
+            <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-background rounded-lg border">
+      
+              {/* HEADER */}
+              <div className="p-4 border-b">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                    <Bot className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="font-semibold">AI Therapist</h2>
+                    <p className="text-sm text-muted-foreground">
+                      {messages.length} messages
+                    </p>
+                  </div>
                 </div>
+              </div>
+      
+              {/* BODY */}
+              {messages.length === 0 ? (
+                <div className="flex-1 flex items-center justify-center p-4">
+                  <div className="max-w-2xl w-full space-y-6 text-center">
+                    <div className="relative inline-flex flex-col items-center">
+                      <motion.div
+                        className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"
+                        initial="initial"
+                        animate="animate"
+                        variants={glowAnimation as any}
+                      />
+                      <Sparkles className="w-10 h-10 text-primary relative z-10" />
+                    </div>
+      
+                    <h2 className="text-2xl font-semibold bg-gradient-to-r from-primary/90 to-primary bg-clip-text text-transparent">
+                      AI Therapist
+                    </h2>
+      
+                    <p className="text-muted-foreground">
+                      How can I assist you today?
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex-1 overflow-y-auto scroll-smooth">
+                  <div className="max-w-3xl mx-auto">
+                    <AnimatePresence initial={false}>
+                      {messages.map((msg) => (
+                        <motion.div
+                          key={msg.timestamp.toISOString()}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className={cn(
+                            "px-6 py-8",
+                            msg.role === "assistant"
+                              ? "bg-muted/30"
+                              : "bg-background"
+                          )}
+                        >
+                          <div className="flex gap-4">
+                            <div className="w-8 h-8 shrink-0 mt-1">
+                              {msg.role === "assistant" ? (
+                                <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center ring-1 ring-primary/20">
+                                  <Bot className="w-5 h-5" />
+                                </div>
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center">
+                                  <User className="w-5 h-5" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              )}
+      
             </div>
+          </div>
         </div>
-    )
-}
+      );
+    }
