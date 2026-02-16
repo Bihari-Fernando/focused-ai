@@ -26,6 +26,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
+  import { Label } from "@/components/ui/label"
 
 const activityTypes = [
     { id: "breathing", name: "Guided Breathing" },
@@ -77,7 +78,23 @@ export function ActivityLogger({open, onOpenChange}
                         <DialogDescription>Record your wellness activity</DialogDescription>
                     
                 </DialogHeader>
-                <form action='' onSubmit={handleSubmit}></form>
+                <form action='' onSubmit={handleSubmit}>
+                    <div className="space-y-2">
+                        <Label>Activity Type</Label>
+                        <Select value={type} onValueChange={setType}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select activity type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {activityTypes.map((type) => (
+                                    <SelectItem key={type.id} value={type.id}>
+                                        {type.name}
+                                    </SelectItem>
+                                ))}                                
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </form>
             </DialogContent>
         </Dialog>
     );
