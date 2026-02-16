@@ -25,9 +25,9 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-  } from "@/components/ui/select"
-  import { Label } from "@/components/ui/label"
-  import { Input } from "@/components/ui/input"
+} from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 
 const activityTypes = [
     { id: "breathing", name: "Guided Breathing" },
@@ -39,16 +39,16 @@ const activityTypes = [
 ];
 
 interface ActivityLoggerProps {
-    open:boolean; 
+    open: boolean;
     onOpenChange: (open: boolean) => void;
 }
 
-export function ActivityLogger({open, onOpenChange}
-: ActivityLoggerProps) {
+export function ActivityLogger({ open, onOpenChange }
+    : ActivityLoggerProps) {
     const [type, setType] = useState("");
-    const [name,setName] = useState("");
-    const [duration,setDuration] = useState("");
-    const [description,setDescription] = useState("");
+    const [name, setName] = useState("");
+    const [duration, setDuration] = useState("");
+    const [description, setDescription] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -68,7 +68,7 @@ export function ActivityLogger({open, onOpenChange}
 
             alert("Activity logged (mock)!");
             onOpenChange(false);
-        },1000);
+        }, 1000);
     };
 
     return (
@@ -76,8 +76,8 @@ export function ActivityLogger({open, onOpenChange}
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Log Activity</DialogTitle>
-                        <DialogDescription>Record your wellness activity</DialogDescription>
-                    
+                    <DialogDescription>Record your wellness activity</DialogDescription>
+
                 </DialogHeader>
                 <form action='' onSubmit={handleSubmit}>
                     <div className="space-y-2">
@@ -91,21 +91,31 @@ export function ActivityLogger({open, onOpenChange}
                                     <SelectItem key={type.id} value={type.id}>
                                         {type.name}
                                     </SelectItem>
-                                ))}                                
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
                     <div className="space-y-2">
                         <Label>Name</Label>
                         <Input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Breathing Session, Focus Game, Confidence Practice, etc."
-                        ></Input>
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Breathing Session, Focus Game, Confidence Practice, etc."
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Duration (minutes)</Label>
+                        <Input
+                            type="number"
+                            value={duration}
+                            onChange={(e) => setDuration(e.target.value)}
+                            placeholder="15"
+                        />
                     </div>
                 </form>
             </DialogContent>
         </Dialog>
     );
 }
-  
+
