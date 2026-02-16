@@ -48,5 +48,25 @@ export function ActivityLogger({open, onOpenChange}
     const [duration,setDuration] = useState("");
     const [description,setDescription] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        setTimeout(() => {
+            console.log({
+                type,
+                name,
+                duration,
+                description,
+            });
+
+            setType("");
+            setName("");
+            setDuration("");
+            setDescription("");
+            setIsLoading(false);
+
+            alert("Activity logged (mock)!");
+            onOpenChange(false);
+        },1000);
+    };
 }
   
