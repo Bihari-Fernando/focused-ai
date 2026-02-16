@@ -68,5 +68,18 @@ export function ActivityLogger({open, onOpenChange}
             onOpenChange(false);
         },1000);
     };
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Log Activity</DialogTitle>
+                        <DialogDescription>Record your wellness activity</DialogDescription>
+                    
+                </DialogHeader>
+                <form action='' onSubmit={handleSubmit}></form>
+            </DialogContent>
+        </Dialog>
+    );
 }
   
