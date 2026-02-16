@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Button } from "../ui/button";
 
 const activityTypes = [
     { id: "breathing", name: "Guided Breathing" },
@@ -121,6 +122,16 @@ export function ActivityLogger({ open, onOpenChange }
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="How did it go?"
                         />
+                    </div>
+
+                    <div className="flex justify-end gap-2">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                        >
+                            Cancel
+                        </Button>
+                        <Button type="submit" disabled>Save Activity</Button>
                     </div>
                 </form>
             </DialogContent>
