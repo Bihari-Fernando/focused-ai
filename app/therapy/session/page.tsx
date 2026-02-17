@@ -124,10 +124,42 @@ export default function TherapyPage() {
                                 </div>
                               )}
                             </div>
+                            <div className="flex-1 space-y-2 overflow-hidden min-h-[2rem]">
+                              <div className="flex items-center justify-between">
+                                <p className="font-medium text-sm">
+                                  {msg.role === "assistant"
+                                    ? "AI Therapist"
+                                    : "You"
+                                  }
+                                </p>
+                              </div>
+                              <div className="prose prose-sm dark:prose-invert leading-relaxed">
+                                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                              </div>
+
+                            </div>
                           </div>
                         </motion.div>
                       ))}
                     </AnimatePresence>
+                    {isTyping && (
+                      <motion.div
+                        initial={{ opacity: 0, y:20 }}
+                        animate={{ opacity: 1, y:0 }}
+                        className="px-6 py-8 flex gap-4 bg-muted/30"
+                      >
+                        <div className="w-8 h-8 shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center ring-1 ring-primary/20">
+                            <Loader2 className="w-4 h-4 animate-spin "/>
+                          </div>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <p className="font-medium text-sm">AI Therapist</p>
+                          <p className="text-sm text-muted-foreground">Typing...</p>
+                        </div>
+                      </motion.div>
+                    )}
+                    <div ref={messagesEndRef}/>
                   </div>
                 </div>
               )}
