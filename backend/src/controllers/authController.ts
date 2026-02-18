@@ -6,17 +6,17 @@ import jwt from "jsonwebtoken";
 
 export const register = async (req: Request, res: Response) => {
     try {
-        const {name, email, password} = req.body;
-        if(!name || !email || !password) {
+        const { name, email, password } = req.body;
+        if (!name || !email || !password) {
             return res
-            .status(400)
-            .json({ message: "Name, email, and password are required." });
+                .status(400)
+                .json({ message: "Name, email, and password are required." });
 
         }
 
         //check if user exist
-        const existingUser = await User.findOne({email});
-        if(existingUser) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
             return res.status(409).json({ message: "Email already in use." });
         }
 
@@ -24,7 +24,7 @@ export const register = async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         //create a new user
-        const user = new User ({name, email, password: hashedPassword });
+        const user = new User({ name, email, password: hashedPassword });
         await user.save();
 
         // respond
@@ -37,6 +37,63 @@ export const register = async (req: Request, res: Response) => {
             message: "User registered successfully.",
         });
     } catch {
-        res.status(500).json({ message: "Sever error", error});
+        res.status(500).json({ message: "Sever error", error });
     }
-}
+};
+
+export const login = async (req: Request, res: Response) => {
+    try {
+        const { email, password } = req.body;
+
+        // Validate input
+        if (!email || !password) {
+            return res
+                .status(400)
+                .json({ message: "Email and password are required." });
+        }
+
+        // Find user
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid email or password." });
+        }
+
+        // Verify password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Invalid email or password." });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET || "your-secret-key",
+            { expiresIn: "24h" }
+        );
+
+        // Create session
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours from now
+
+        const session = new Session({
+            userId: user._id,
+            token,
+            expiresAt,
+            deviceInfo: req.headers["user-agent"],
+        });
+        await session.save();
+
+        // Respond with user data and token
+        res.json({
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+            },
+            token,
+            message: "Login successful",
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
+};
