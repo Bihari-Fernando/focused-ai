@@ -5,22 +5,33 @@ import { serve } from "inngest/express";
 import { inngest } from "./inngest/index";
 import { logger } from './utils/logger';
 import { connectDB }  from "./utils/db";
+import dotenv from "dotenv";
+import morgan from "morgan";
+import cors from "cors";
+import helmet from "helmet";
+import authRoutes from "./routes/auth";
+import { errorHandler } from './middleware/errorHandler';
+
+dotenv.config();
 
 const app = express();
 
-const PORT = 3001
 
+//middleware
+app.use(cors());
+app.use(helmet());
+app.use(morgan("dev"));
+
+// parse JSON bodt
 app.use(express.json());
 
 app.use("/api/inngest", serve({ client: inngest, functions: inngestFunctions }));
 
-app.get("/", (req: Request, res: Response) => {
-    res.send("Hello World!");
-});
+//routes
+app.use("/auth", authRoutes);
 
-app.get("/api/chat", (req: Request, res: Response) => {
-    res.send("Hi, how may I help you today?");
-});
+// error handling
+app.use(errorHandler);
 
 // Start server
 const startServer = async () => {
