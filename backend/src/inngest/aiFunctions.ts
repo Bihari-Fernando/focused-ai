@@ -259,28 +259,38 @@ Do NOT include markdown. Return JSON only.
                     analysis,
                 });
 
-                // Here you can store in DB
                 return analysis;
             });
 
-            return analysis;
+            // If high stress or low focus is detected, log a wellness alert
+            if (
+                analysis.stressLevel === "high" ||
+                analysis.focusPerformance === "low" ||
+                analysis.confidenceLevel === "low"
+            ) {
+                await step.run("trigger-wellness-alert", async () => {
+                    logger.warn("Potential wellness alert detected in session analysis", {
+                        sessionId: event.data.sessionId,
+                        stressLevel: analysis.stressLevel,
+                        focusPerformance: analysis.focusPerformance,
+                        confidenceLevel: analysis.confidenceLevel,
+                        recommendedActivity: analysis.recommendedNextActivity,
+                    });
+                    // alert logic here
+                });
+            }
+
+            return {
+                message: "Wellness session analysis completed",
+                analysis,
+                recommendedActivity: analysis.recommendedNextActivity,
+                insights: analysis.keyInsights,
+            };
+
 
         } catch (error) {
             logger.error("Error analyzing wellness session:", error);
-
-            // Fallback wellness analysis
-            return {
-                emotionalTrend: "stable",
-                stressLevel: "moderate",
-                focusPerformance: "average",
-                confidenceLevel: "stable",
-                keyInsights: [],
-                recommendedNextActivity: "breathing",
-                improvementSuggestions: [
-                    "Try a short breathing session",
-                    "Engage in a quick focus exercise",
-                ],
-            };
+            throw error;
         }
     }
 );
