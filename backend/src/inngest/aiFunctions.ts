@@ -132,7 +132,7 @@ Required JSON structure:
             // Generate wellness coaching response
             const response = await step.run("generate-response", async () => {
                 try {
-                  const prompt = `
+                    const prompt = `
               You are an AI Wellness Coach focused on stress relief, focus improvement, and confidence building.
               
               Based on the following context, generate a supportive and motivational response.
@@ -152,37 +152,136 @@ Required JSON structure:
               Do NOT mention therapy or clinical terms.
               Keep it clear, encouraging, and actionable.
               `;
-              
-                  const geminiResponse = await ai.models.generateContent({
-                    model: "gemini-2.0-flash",
-                    contents: prompt,
-                  });
-              
-                  const responseText = geminiResponse.text?.trim() || "";
-              
-                  logger.info("Generated wellness response:", { responseText });
-              
-                  return responseText;
-              
+
+                    const geminiResponse = await ai.models.generateContent({
+                        model: "gemini-2.0-flash",
+                        contents: prompt,
+                    });
+
+                    const responseText = geminiResponse.text?.trim() || "";
+
+                    logger.info("Generated wellness response:", { responseText });
+
+                    return responseText;
+
                 } catch (error) {
-                  logger.error("Error generating wellness response:", error);
-              
-                  return "You're doing your best, and that matters. Let’s take a short breathing session to reset your mind and improve focus.";
+                    logger.error("Error generating wellness response:", { error, message });
+
+                    return "You're doing your best, and that matters. Let’s take a short breathing session to reset your mind and improve focus.";
                 }
-              });
-              
+            });
 
-
-
-
-
-
-
-
-
+            // Return the response in the expected format
+            return {
+                response,
+                analysis,
+                updatedMemory,
+            };
 
         } catch (error) {
-            logger.error("Outer function error:", error);
-            throw error;
+            logger.error("Error in chat message processing:", {
+                error,
+                message: event.data.message,
+            });
+
+
+            return {
+                response:
+                    "You're doing okay. Let’s take a short breathing session to reset your mind and improve your focus.",
+
+                analysis: {
+                    emotionalState: "calm",
+                    stressLevel: "moderate",
+                    focusLevel: "average",
+                    confidenceLevel: "stable",
+                    recommendedActivity: "breathing",
+                    encouragementMessage:
+                        "Small steps like a quick reset can help you regain clarity and confidence.",
+                },
+
+                updatedMemory: event.data.memory,
+            };
+
         }
-    });
+    }
+);
+
+// Function to analyze wellness session content
+export const analyzeWellnessSession = inngest.createFunction(
+    { id: "analyze-wellness-session" },
+    { event: "wellness/session.completed" },
+    async ({ event, step }) => {
+        try {
+            // Get session content (chat, notes, activity feedback)
+            const sessionContent = await step.run("get-session-content", async () => {
+                return event.data.notes || event.data.transcript || "";
+            });
+
+            // Analyze the session using Gemini
+            const analysis = await step.run("analyze-with-gemini", async () => {
+
+                const prompt = `
+You are an AI Wellness Performance Analyzer.
+
+Analyze the following wellness session related to stress management, focus training, or confidence building.
+
+Session Content:
+${sessionContent}
+
+Provide the output as a valid JSON object with this structure:
+
+{
+  "emotionalTrend": "string",
+  "stressLevel": "low | moderate | high",
+  "focusPerformance": "low | average | high",
+  "confidenceLevel": "low | stable | high",
+  "keyInsights": ["string"],
+  "recommendedNextActivity": "breathing | focus-game | confidence-builder | stress-reset | mindfulness",
+  "improvementSuggestions": ["string"]
+}
+
+Do NOT include markdown. Return JSON only.
+`;
+
+                const geminiResponse = await ai.models.generateContent({
+                    model: "gemini-2.0-flash",
+                    contents: prompt,
+                });
+                const text = geminiResponse.text?.trim() || "";
+                const cleanText = text.replace(/```json|```/g, "").trim();
+
+                return JSON.parse(cleanText);
+            });
+
+            // Store the wellness analysis
+            await step.run("store-analysis", async () => {
+                logger.info("Wellness session analysis stored successfully", {
+                    analysis,
+                });
+
+                // Here you can store in DB
+                return analysis;
+            });
+
+            return analysis;
+
+        } catch (error) {
+            logger.error("Error analyzing wellness session:", error);
+
+            // Fallback wellness analysis
+            return {
+                emotionalTrend: "stable",
+                stressLevel: "moderate",
+                focusPerformance: "average",
+                confidenceLevel: "stable",
+                keyInsights: [],
+                recommendedNextActivity: "breathing",
+                improvementSuggestions: [
+                    "Try a short breathing session",
+                    "Engage in a quick focus exercise",
+                ],
+            };
+        }
+    }
+);
+
