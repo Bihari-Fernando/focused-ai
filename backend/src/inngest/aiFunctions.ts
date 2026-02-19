@@ -85,11 +85,60 @@ Required JSON structure:
                     };
                 }
             });
-
             return analysis;
+
+
+            // Update memory based on wellness analysis
+            const updatedMemory = await step.run("update-memory", async () => {
+                if (analysis.emotionalState) {
+                    memory.userProfile.emotionalHistory =
+                        memory.userProfile.emotionalHistory || [];
+                    memory.userProfile.emotionalHistory.push(analysis.emotionalState);
+                }
+
+                if (analysis.stressLevel) {
+                    memory.userProfile.stressLevel = analysis.stressLevel;
+                }
+
+                if (analysis.focusLevel) {
+                    memory.userProfile.focusLevel = analysis.focusLevel;
+                }
+
+                if (analysis.confidenceLevel) {
+                    memory.userProfile.confidenceLevel = analysis.confidenceLevel;
+                }
+
+                if (analysis.recommendedActivity) {
+                    memory.sessionContext.recommendedActivities =
+                        memory.sessionContext.recommendedActivities || [];
+                    memory.sessionContext.recommendedActivities.push(
+                        analysis.recommendedActivity
+                    );
+                }
+
+                return memory;
+            });
+
+            // If high stress detected, trigger calming support log
+            if (analysis.stressLevel === "high") {
+                await step.run("trigger-stress-support", async () => {
+                    logger.warn("High stress level detected in wellness session", {
+                        message,
+                        stressLevel: analysis.stressLevel,
+                    });
+                });
+            }
+
+
+
+
+
+
+
+
+
         } catch (error) {
             logger.error("Outer function error:", error);
             throw error;
         }
-    }
-);
+    });
