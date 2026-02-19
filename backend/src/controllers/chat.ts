@@ -5,7 +5,9 @@ import { inngest } from "../inngest/index";
 import { User } from "@/models/User";
 import { Types } from "mongoose";
 import { GoogleGenAI } from "@google/genai";
-import { InngestSesionResponse, InngestEvent } from "../types/inngest";
+//import { InngestSesionResponse, InngestEvent } from "../types/inngest";
+import { ChatSession, IChatSession } from "../models/chat";
+
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -77,7 +79,7 @@ export const sendMessage = async (req: Request, res: Response) => {
   
       // Create Inngest event
       const event: InngestEvent = {
-        name: "therapy/session.message", // keep if already wired
+        name: "therapy/session.message", 
         data: {
           message,
           history: session.messages,
@@ -154,9 +156,8 @@ export const sendMessage = async (req: Request, res: Response) => {
   
       logger.info("Generated wellness response:", response);
   
-      // -----------------------------
-      // 📝 Save to Session
-      // -----------------------------
+      // Save to Session
+      
       session.messages.push({
         role: "user",
         content: message,
@@ -204,3 +205,31 @@ export const sendMessage = async (req: Request, res: Response) => {
     }
   };
   
+
+  // Get chat session history
+export const getSessionHistory = async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.params;
+      const userId = new Types.ObjectId(req.user.id);
+  
+      const session = (await ChatSession.findById(
+        sessionId
+      ).exec()) as IChatSession;
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+  
+      if (session.userId.toString() !== userId.toString()) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+  
+      res.json({
+        messages: session.messages,
+        startTime: session.startTime,
+        status: session.status,
+      });
+    } catch (error) {
+      logger.error("Error fetching session history:", error);
+      res.status(500).json({ message: "Error fetching session history" });
+    }
+  };
