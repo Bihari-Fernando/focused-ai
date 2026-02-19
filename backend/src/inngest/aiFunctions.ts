@@ -129,6 +129,50 @@ Required JSON structure:
                 });
             }
 
+            // Generate wellness coaching response
+            const response = await step.run("generate-response", async () => {
+                try {
+                  const prompt = `
+              You are an AI Wellness Coach focused on stress relief, focus improvement, and confidence building.
+              
+              Based on the following context, generate a supportive and motivational response.
+              
+              Message: ${message}
+              Analysis: ${JSON.stringify(analysis)}
+              Memory: ${JSON.stringify(memory)}
+              Goals: ${JSON.stringify(goals)}
+              
+              Provide a response that:
+              1. Acknowledges the user's emotional state
+              2. Offers practical guidance for stress, focus, or confidence
+              3. Suggests an appropriate activity (breathing, focus-game, confidence-builder, stress-reset, mindfulness)
+              4. Encourages positive action
+              5. Maintains a calm, supportive tone
+              
+              Do NOT mention therapy or clinical terms.
+              Keep it clear, encouraging, and actionable.
+              `;
+              
+                  const geminiResponse = await ai.models.generateContent({
+                    model: "gemini-2.0-flash",
+                    contents: prompt,
+                  });
+              
+                  const responseText = geminiResponse.text?.trim() || "";
+              
+                  logger.info("Generated wellness response:", { responseText });
+              
+                  return responseText;
+              
+                } catch (error) {
+                  logger.error("Error generating wellness response:", error);
+              
+                  return "You're doing your best, and that matters. Let’s take a short breathing session to reset your mind and improve focus.";
+                }
+              });
+              
+
+
 
 
 
