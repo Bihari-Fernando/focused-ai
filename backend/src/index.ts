@@ -11,6 +11,9 @@ import cors from "cors";
 import helmet from "helmet";
 import authRoutes from "./routes/auth";
 import { errorHandler } from './middleware/errorHandler';
+import chatRouter from "./routes/chat";
+import moodRouter from "./routes/mood";
+import activityRouter from "./routes/activity";
 
 dotenv.config();
 
@@ -29,6 +32,9 @@ app.use("/api/inngest", serve({ client: inngest, functions: inngestFunctions }))
 
 //routes
 app.use("/auth", authRoutes);
+app.use("/chat", chatRouter);
+app.use('/api/mood', moodRouter);
+app.use('/api/activity', activityRouter);
 
 // error handling
 app.use(errorHandler);
