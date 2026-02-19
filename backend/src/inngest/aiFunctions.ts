@@ -1,5 +1,6 @@
 import { inngest } from "./index";
 import { GoogleGenAI } from "@google/genai";
+import { logger } from "@/utils/logger";
 
 const genAI = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY || 'AIzaSyDIaNP8hRN6dTU28b9mi5nl_JAGvSaAHZ4'
@@ -29,6 +30,11 @@ export const processChatMessage = inngest.createFunction(
                 goals = [],
                 systemPrompt,
             } = event.data;
+
+            logger.info("Processing chat message:", {
+                message,
+                historyLength: history?.length,
+              });
         } catch (error) { }
     }
 );
