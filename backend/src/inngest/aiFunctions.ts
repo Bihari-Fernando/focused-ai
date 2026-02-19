@@ -85,14 +85,12 @@ Required JSON structure:
                     };
                 }
             });
-            return analysis;
-
 
             // Update memory based on wellness analysis
             const updatedMemory = await step.run("update-memory", async () => {
                 if (analysis.emotionalState) {
                     memory.userProfile.emotionalHistory =
-                        memory.userProfile.emotionalHistory || [];
+                    memory.userProfile.emotionalHistory || [];
                     memory.userProfile.emotionalHistory.push(analysis.emotionalState);
                 }
 
@@ -294,4 +292,77 @@ Do NOT include markdown. Return JSON only.
         }
     }
 );
+
+// Function to generate personalized wellness activity recommendations
+export const generateWellnessRecommendations = inngest.createFunction(
+    { id: "generate-wellness-recommendations" },
+    { event: "mood/updated" },
+    async ({ event, step }) => {
+        try {
+            // Get user's recent wellness context
+            const userContext = await step.run("get-user-context", async () => {
+                // Typically fetch user's session history from your DB
+                return {
+                    recentStressLevels: event.data.recentStressLevels, // low | moderate | high
+                    recentFocusLevels: event.data.recentFocusLevels,   // low | average | high
+                    recentConfidenceLevels: event.data.recentConfidenceLevels, // low | stable | high
+                    completedActivities: event.data.completedActivities,
+                    preferences: event.data.preferences,
+                };
+            });
+
+            // Generate personalized activity recommendations using AI
+            const recommendations = await step.run("generate-recommendations", async () => {
+
+                const prompt = `
+  You are an AI assistant for students to improve wellness, reduce stress, boost focus, and build confidence.
+  
+  Based on the following user context, provide 3-5 personalized activity recommendations. Include:
+  1. Activity name (breathing, focus-game, confidence-builder, stress-reset, mindfulness)
+  2. Reasoning for this recommendation
+  3. Expected benefit (stress relief, focus improvement, confidence boost)
+  4. Difficulty level (easy, medium, hard)
+  5. Estimated duration (minutes)
+  
+  Return ONLY a valid JSON array of recommendations.
+  
+  User Context: ${JSON.stringify(userContext)}
+  `;
+
+                const geminiResponse = await ai.models.generateContent({
+                    model: "gemini-2.0-flash",
+                    contents: prompt,
+                });
+                const text = geminiResponse.text?.trim() || "";
+                const cleanText = text.replace(/```json|```/g, "").trim();
+
+                return JSON.parse(cleanText);
+            });
+
+            // Store recommendations in database or cache
+            await step.run("store-recommendations", async () => {
+                logger.info("Wellness activity recommendations stored successfully", {
+                    recommendations,
+                });
+                return recommendations;
+            });
+
+            return {
+                message: "Wellness activity recommendations generated",
+                recommendations,
+            };
+        } catch (error) {
+            logger.error("Error generating wellness activity recommendations:", error);
+            throw error;
+        }
+    }
+);
+
+// Add the functions to the exported array
+export const functions = [
+    processChatMessage,
+    analyzeWellnessSession,
+    generateWellnessRecommendations,
+  ];
+
 
