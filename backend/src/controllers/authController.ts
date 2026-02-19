@@ -36,7 +36,7 @@ export const register = async (req: Request, res: Response) => {
             },
             message: "User registered successfully.",
         });
-    } catch {
+    } catch(error) {
         res.status(500).json({ message: "Sever error", error });
     }
 };
