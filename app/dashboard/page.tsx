@@ -1,8 +1,8 @@
 "use client"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Container } from "@/components/ui/container";
 import { motion } from "framer-motion";
-import { MessageSquare, ArrowRight, Heart, BrainCircuit, Brain, Activity, Trophy } from "lucide-react";
+import { MessageSquare, ArrowRight, Heart, BrainCircuit, Brain, Activity, Trophy, Bell } from "lucide-react";
 import { format } from "date-fns";
 import {
     Card,
@@ -31,11 +31,15 @@ import { MoodForm } from "@/components/mood/mood-form";
 import { ActivityLogger } from "@/components/activities/activity-logger";
 import { useRouter } from "next/navigation";
 
+import { useSession } from "@/lib/contexts/session-context";
+
 export default function dashboardPage() {
     const [currentTime, setCurrentTime] = useState(new Date())
     const [showMoodModal, setShowMoodModal] = useState(false);
     const [isSavingMood, setIsSavingMood] = useState(false);
     const [showActivityLogger, setShowActivityLogger] = useState(false);
+    const { user } = useSession();
+    const router = useRouter();
 
     const wellnessStats = [
         {
@@ -72,24 +76,26 @@ export default function dashboardPage() {
         },
     ];
 
-
-    const router = useRouter();
-
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
-    const handleMoodSubmit = async(data: {moodScore: number }) => {
+    const handleMoodSubmit = async (data: { moodScore: number }) => {
         setIsSavingMood(true);
         try {
-            setShowMoodModal(false);
-        } catch (eroor) {
-            console.error("Error saving mood:",error);
+          await saveMoodData({
+            userId: "default-user",
+            mood: data.moodScore,
+            note: "",
+          });
+          setShowMoodModal(false);
+        } catch (error) {
+          console.error("Error saving mood:", error);
         } finally {
-            setIsSavingMood(false);
+          setIsSavingMood(false);
         }
-    };
+      };
 
     const handleAICheckIn = () => {
         setShowActivityLogger(true);
@@ -102,14 +108,16 @@ export default function dashboardPage() {
     return (
         <div className="min-h-screen bg-background p-8">
             <Container className="pt-20 pb-8 space-y-6">
-                <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="flex flex-col gap-2">
-                        <h1 className="text-3xl font-bold">Welcome back</h1>
-                        <p className="text-muted-foreground text-sm">
+                        className="space-y-2"
+                    >
+                        <h1 className="text-3xl font-bold text-foreground">
+                            Welcome back, {user?.name || "there"}
+                        </h1>
+                        <p className="text-muted-foreground">
                             {currentTime.toLocaleDateString("en-US", {
                                 weekday: "long",
                                 month: "long",
@@ -117,6 +125,11 @@ export default function dashboardPage() {
                             })}
                         </p>
                     </motion.div>
+                    <div className="flex items-center gap-4">
+                        <Button variant="outline" size="icon">
+                            <Bell className="h-5 w-5" />
+                        </Button>
+                    </div>
                 </div>
 
                 {/* main grid layout */}
@@ -265,13 +278,14 @@ export default function dashboardPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-3 space-y-6">
                             {/* anxiety games */}
-                            <AnxietyGames/>
+                            <AnxietyGames />
                         </div>
                     </div>
 
 
                 </div>
             </Container>
+            {/* mood trracking modal */}
             <Dialog open={showMoodModal} onOpenChange={setShowMoodModal}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
@@ -281,7 +295,7 @@ export default function dashboardPage() {
                         </DialogDescription>
                     </DialogHeader>
                     {/* moodform */}
-                    <MoodForm onSubmit={handleMoodSubmit} isLoading={isSavingMood}/>
+                    <MoodForm onSuccess={() => setShowMoodModal(false)} />
                 </DialogContent>
             </Dialog>
 
