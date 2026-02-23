@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { functions as inngestFunctions } from './inngest/functions';
 const express = require('express');
 import { Request, Response } from "express";
@@ -9,7 +11,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
 import helmet from "helmet";
-import authRoutes from "./routes/auth";
+import authRoute from "./routes/auth";
 import { errorHandler } from './middleware/errorHandler';
 import chatRouter from "./routes/chat";
 import moodRouter from "./routes/mood";
@@ -31,7 +33,7 @@ app.use(express.json());
 app.use("/api/inngest", serve({ client: inngest, functions: inngestFunctions }));
 
 //routes
-app.use("/auth", authRoutes);
+app.use("/auth", authRoute);
 app.use("/chat", chatRouter);
 app.use('/api/mood', moodRouter);
 app.use('/api/activity', activityRouter);
