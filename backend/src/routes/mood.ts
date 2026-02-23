@@ -1,6 +1,6 @@
 import express from "express";
 import { auth } from "../middleware/auth";
-import { createMood } from "../controller/moodController";
+import { createMood } from "../controllers/moodController";
 
 const router = express.Router();
 
