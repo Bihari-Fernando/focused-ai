@@ -34,8 +34,11 @@ const activitySchema = new Schema<IActivity>({
     },
     description: {
         type: String,
-        min: 0,
     },
+    duration: {
+        type: Number,
+        min: 0,
+      },
     timestamp: {
         type: Date,
         default: Date.now,
