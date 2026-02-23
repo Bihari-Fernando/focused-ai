@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { logger } from "../utils/logger";
 import { inngest } from "../inngest/index";
-import { User } from "@/models/User";
+import { User } from "../models/User";
 import { Types } from "mongoose";
 import { GoogleGenAI } from "@google/genai";
-//import { InngestSesionResponse, InngestEvent } from "../types/inngest";
-import { ChatSession, IChatSession } from "../models/chat";
+import {  InngestEvent, InngestSessionResponse } from "../types/inngest";
+import { ChatSession, IChatSession } from "../models/ChatSession";
 
 
 const ai = new GoogleGenAI({
