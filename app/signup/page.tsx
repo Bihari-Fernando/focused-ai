@@ -8,7 +8,7 @@ import { Container } from "@/components/ui/container";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Mail, User, Lock } from "lucide-react";
-//import { registerUser } from "@/lib/api/auth";
+import { registerUser } from "@/lib/api/auth";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  {/*const handleSubmit = async (e: React.FormEvent) => {
+   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (password !== confirmPassword) {
@@ -35,7 +35,7 @@ export default function SignupPage() {
     } finally {
       setLoading(false);
     }
-  }; */ }
+  }; 
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/30">
@@ -49,7 +49,7 @@ export default function SignupPage() {
               Create your account to start your journey with FocusedAI.
             </p>
           </div>
-          <form className="space-y-6" >
+          <form className="space-y-6" onSubmit={handleSubmit} >
             <div className="space-y-3">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
