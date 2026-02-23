@@ -1,13 +1,17 @@
 'use client';
 
 import Link from "next/link";
-import { Leaf, Menu, X } from 'lucide-react';
+import { Leaf, Menu, X, MessageCircle, LogOut, LogIn } from 'lucide-react';
 import ThemeToggle from '@/components/theme-toggle';
 import SignInButton from '@/components/auth/sign-in-button';
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { useSession } from "@/lib/contexts/session-context"
 
 export default function Header() {
+  const { isAuthenticated, logout, user } = useSession();
+  console.log("Header: Auth state:", { isAuthenticated, user });
+
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
@@ -41,7 +45,30 @@ export default function Header() {
             </nav>
             <div className="flex items-center gap-3">
               <ThemeToggle />
-              <SignInButton />
+              {isAuthenticated ? (
+                <>
+                  <Button
+                    asChild
+                    className="hidden md:flex gap-2 bg-primary/90 hover:bg-primary"
+                  >
+                    <Link href="/therapy/session">
+                      <MessageCircle className="w-4 h-4 mr-1" />
+                      Start Chat
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={logout}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign out
+                  </Button>
+                </>
+              ) : (
+                <SignInButton />
+              )}
+
               <Button
                 variant="ghost"
                 size="icon"
@@ -73,6 +100,17 @@ export default function Header() {
                   {item.label}
                 </Link>
               ))}
+              {isAuthenticated && (
+                <Button
+                  asChild
+                  className="mt-2 mx-4 gap-2 bg-primary/90 hover:bg-primary"
+                >
+                  <Link href="/dashboard">
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Start Chat</span>
+                  </Link>
+                </Button>
+              )}
             </nav>
           </div>
         )}
