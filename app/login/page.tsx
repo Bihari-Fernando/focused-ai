@@ -2,24 +2,24 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-//import { loginUser } from "@/lib/api/auth";
+import { loginUser } from "@/lib/api/auth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
-//import { useSession } from "@/lib/contexts/session-context";
+import { useSession } from "@/lib/contexts/session-context";
 
 export default function LoginPage() {
   const router = useRouter();
-  //const { checkSession } = useSession();
+  const { checkSession } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  {/* const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -44,7 +44,7 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  }; */}
+  }; 
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/30">
@@ -58,7 +58,7 @@ export default function LoginPage() {
               Welcome back! Please sign in to continue your journey.
             </p>
           </div>
-          <form className="space-y-6" >
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-3">
               <div>
                 <label
