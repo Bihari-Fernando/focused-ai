@@ -7,7 +7,7 @@ import { Types } from "mongoose";
 import { GoogleGenAI } from "@google/genai";
 import {  InngestEvent, InngestSessionResponse } from "../types/inngest";
 import { ChatSession, IChatSession } from "../models/ChatSession";
-
+import dotenv from "dotenv";
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -55,6 +55,33 @@ export const createChatSession = async (req: Request, res: Response) => {
       });
     }
   };
+
+// Get all chat sessions for the authenticated user
+export const getAllChatSessions = async (req: Request, res: Response) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized - User not authenticated" });
+    }
+
+    const userId = new Types.ObjectId(req.user.id);
+
+    const sessions = await ChatSession.find({ userId })
+      .sort({ updatedAt: -1 })
+      .exec();
+
+    logger.info(`Found ${sessions.length} chat sessions for user ${userId}`);
+
+    res.json(sessions);
+  } catch (error) {
+    logger.error("Error fetching chat sessions:", error);
+    res.status(500).json({
+      message: "Error fetching chat sessions",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
 
  // Send a message in the chat session
 export const sendMessage = async (req: Request, res: Response) => {
