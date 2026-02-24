@@ -6,12 +6,16 @@ import {
   getSessionHistory,
   getChatSession,
   getChatHistory,
+  getAllChatSessions,
 } from "../controllers/chat";
 
 const router = express.Router();
 
 // All routes are protected with authentication
 router.use(auth);
+
+// Get all chat sessions for the authenticated user
+router.get("/sessions", getAllChatSessions);
 
 // Create a new chat session
 router.post("/sessions", createChatSession);
