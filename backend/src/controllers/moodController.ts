@@ -11,8 +11,7 @@ export const createMood = async (
 ) => {
   try {
     const { score, note, context, activities } = req.body;
-    const userId = req.user?._id; // From auth middleware
-
+    const userId = req.user?._id; 
     if (!userId) {
       return res.status(401).json({ message: "User not authenticated" });
     }
