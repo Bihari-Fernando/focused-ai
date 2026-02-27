@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 import { functions as inngestFunctions } from './inngest/functions';
-const express = require('express');
+import express from "express";
 import { Request, Response } from "express";
 import { serve } from "inngest/express";
 import { inngest } from "./inngest/index";
