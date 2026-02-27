@@ -32,6 +32,7 @@ import { ActivityLogger } from "@/components/activities/activity-logger";
 import { useRouter } from "next/navigation";
 
 import { useSession } from "@/lib/contexts/session-context";
+import { saveMoodData } from "@/lib/static-dashboard-data";
 
 export default function dashboardPage() {
     const [currentTime, setCurrentTime] = useState(new Date())
