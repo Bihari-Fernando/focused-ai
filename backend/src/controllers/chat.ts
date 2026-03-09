@@ -128,7 +128,12 @@ export const sendMessage = async (req: Request, res: Response) => {
   
       logger.info("Sending wellness event to Inngest:", { event });
   
-      await inngest.send(event);
+      // Fire-and-forget Inngest event; don't block or fail the main chat flow
+      try {
+        await inngest.send(event);
+      } catch (inngestError) {
+        logger.error("Failed to send Inngest event (non-fatal):", inngestError);
+      }
   
       const analysisPrompt = `
   Analyze this student wellness message and return ONLY valid JSON.
@@ -147,7 +152,7 @@ export const sendMessage = async (req: Request, res: Response) => {
   `;
   
       const analysisResult = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash",
         contents: analysisPrompt,
       });
       const analysisText = analysisResult.text?.trim() || "";
@@ -176,7 +181,7 @@ export const sendMessage = async (req: Request, res: Response) => {
   `;
   
       const responseResult = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash",
         contents: responsePrompt,
       });
       const response = responseResult.text?.trim() || "";
