@@ -56,7 +56,7 @@ Required JSON structure:
 `;
 
                     const response = await ai.models.generateContent({
-                        model: "gemini-2.0-flash",
+                        model: "gemini-2.5-flash",
                         contents: prompt,
                     });
 
@@ -152,7 +152,7 @@ Required JSON structure:
               `;
 
                     const geminiResponse = await ai.models.generateContent({
-                        model: "gemini-2.0-flash",
+                        model: "gemini-2.5-flash",
                         contents: prompt,
                     });
 
@@ -242,7 +242,7 @@ Do NOT include markdown. Return JSON only.
 `;
 
                 const geminiResponse = await ai.models.generateContent({
-                    model: "gemini-2.0-flash",
+                    model: "gemini-2.5-flash",
                     contents: prompt,
                 });
                 const text = geminiResponse.text?.trim() || "";
@@ -330,7 +330,7 @@ export const generateWellnessRecommendations = inngest.createFunction(
   `;
 
                 const geminiResponse = await ai.models.generateContent({
-                    model: "gemini-2.0-flash",
+                    model: "gemini-2.5-flash",
                     contents: prompt,
                 });
                 const text = geminiResponse.text?.trim() || "";
