@@ -106,9 +106,20 @@ export const sendChatMessage = async (
 
     if (!response.ok) {
       const error = await response.json();
-      console.error("Failed to send message:", error);
-      throw new Error(error.error || "Failed to send message");
-    }
+  
+      // Try to parse the error.error if it's a JSON string
+      let msg = "Failed to send message";
+      try {
+          const parsedError = typeof error.error === "string" ? JSON.parse(error.error) : error.error;
+          msg = parsedError?.error?.message || error.message || msg;
+      } catch {
+          // fallback to the original error message
+          msg = error.message || msg;
+      }
+  
+      console.error("Failed to send message:", msg);
+      throw new Error(msg);
+  }
 
     const data = await response.json();
     console.log("Message sent successfully:", data);
