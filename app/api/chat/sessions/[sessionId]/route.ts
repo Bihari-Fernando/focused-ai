@@ -69,3 +69,38 @@ export async function POST(
     );
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { sessionId: string } }
+) {
+  try {
+    const { sessionId } = params;
+    const response = await fetch(
+      `${BACKEND_API_URL}/chat/sessions/${sessionId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          // Forward authorization header if present
+          ...(req.headers.get("authorization") && {
+            Authorization: req.headers.get("authorization")!,
+          }),
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Error in delete chat session API:", error);
+    return NextResponse.json(
+      { error: "Failed to delete chat session" },
+      { status: 500 }
+    );
+  }
+}
