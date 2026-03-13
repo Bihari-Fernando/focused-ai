@@ -7,6 +7,7 @@ import {
   getChatSession,
   getChatHistory,
   getAllChatSessions,
+  deleteChatSession,
 } from "../controllers/chat";
 
 const router = express.Router();
@@ -28,5 +29,8 @@ router.post("/sessions/:sessionId/messages", sendMessage);
 
 // Get chat history for a session
 router.get("/sessions/:sessionId/history", getChatHistory);
+
+// Delete a chat session
+router.delete("/sessions/:sessionId", deleteChatSession);
 
 export default router;
