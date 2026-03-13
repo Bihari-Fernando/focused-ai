@@ -114,53 +114,52 @@ export default function TherapyPage() {
 
   // Initialize chat session and load history
   useEffect(() => {
-    const initChat = async () => {
-      try {
-        setIsLoading(true);
-        if (!sessionId || sessionId === "new") {
-          console.log("Creating new chat session...");
+  const initChat = async () => {
+    try {
+      setIsLoading(true);
+
+      if (!sessionId || sessionId === "new") {
+        // Try to load last session from backend
+        const allSessions = await getAllChatSessions();
+        if (allSessions.length > 0) {
+          // Use the latest session
+          const latest = allSessions[0];
+          setSessionId(latest.sessionId);
+          setMessages(latest.messages.map(msg => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+          })));
+          window.history.pushState({}, "", `/therapy/${latest.sessionId}`);
+        } else {
+          // No previous sessions, create new one
           const newSessionId = await createChatSession();
-          console.log("New session created:", newSessionId);
           setSessionId(newSessionId);
           window.history.pushState({}, "", `/therapy/${newSessionId}`);
-        } else {
-          console.log("Loading existing chat session:", sessionId);
-          try {
-            const history = await getChatHistory(sessionId);
-            console.log("Loaded chat history:", history);
-            if (Array.isArray(history)) {
-              const formattedHistory = history.map((msg) => ({
-                ...msg,
-                timestamp: new Date(msg.timestamp),
-              }));
-              console.log("Formatted history:", formattedHistory);
-              setMessages(formattedHistory);
-            } else {
-              console.error("History is not an array:", history);
-              setMessages([]);
-            }
-          } catch (historyError) {
-            console.error("Error loading chat history:", historyError);
-            setMessages([]);
-          }
         }
-      } catch (error) {
-        console.error("Failed to initialize chat:", error);
-        setMessages([
-          {
-            role: "assistant",
-            content:
-              "I apologize, but I'm having trouble loading the chat session. Please try refreshing the page.",
-            timestamp: new Date(),
-          },
-        ]);
-      } finally {
-        setIsLoading(false);
+      } else {
+        // Load the session from sessionId in URL
+        const history = await getChatHistory(sessionId);
+        if (Array.isArray(history)) {
+          setMessages(history.map(msg => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+          })));
+        }
       }
-    };
+    } catch (error) {
+      console.error("Failed to initialize chat:", error);
+      setMessages([{
+        role: "assistant",
+        content: "I apologize, but I'm having trouble loading the chat session. Please try refreshing the page.",
+        timestamp: new Date(),
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    initChat();
-  }, [sessionId]);
+  initChat();
+}, [sessionId]);
 
   // Load all chat sessions
   useEffect(() => {
