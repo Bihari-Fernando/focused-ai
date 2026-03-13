@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Send, Bot, User, Loader2, Sparkles, MessageSquare, PlusCircle } from "lucide-react";
+import { Send, Bot, User, Loader2, Sparkles, MessageSquare, PlusCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -14,6 +14,7 @@ import {
   ChatMessage,
   getAllChatSessions,
   ChatSession,
+  deleteChatSession,
 } from "@/lib/api/chat";
 
 import { formatDistanceToNow } from "date-fns";
@@ -334,6 +335,36 @@ export default function TherapyPage() {
     }
   };
 
+  const handleDeleteSession = async (sessionIdToDelete: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering session selection
+
+    if (!confirm("Are you sure you want to delete this chat session? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      await deleteChatSession(sessionIdToDelete);
+      
+      // Remove from sessions list
+      setSessions(prev => prev.filter(session => session.sessionId !== sessionIdToDelete));
+      
+      // If the deleted session was the current one, switch to another session or create new
+      if (sessionIdToDelete === sessionId) {
+        const remainingSessions = sessions.filter(session => session.sessionId !== sessionIdToDelete);
+        if (remainingSessions.length > 0) {
+          // Switch to the first remaining session
+          await handleSessionSelect(remainingSessions[0].sessionId);
+        } else {
+          // No sessions left, create a new one
+          await handleNewSession();
+        }
+      }
+    } catch (error) {
+      console.error("Failed to delete session:", error);
+      alert("Failed to delete the chat session. Please try again.");
+    }
+  };
+
   return (
     <div className="relative max-w-7xl mx-auto px-4">
       <div className="flex h-[calc(100vh-4rem)] mt-20 gap-6">
@@ -377,7 +408,7 @@ export default function TherapyPage() {
                 <div
                   key={session.sessionId}
                   className={cn(
-                    "p-3 rounded-lg text-sm cursor-pointer hover:bg-primary/5 transition-colors",
+                    "p-3 rounded-lg text-sm cursor-pointer hover:bg-primary/5 transition-colors group relative",
                     session.sessionId === sessionId
                       ? "bg-primary/10 text-primary"
                       : "bg-secondary/10"
@@ -386,9 +417,17 @@ export default function TherapyPage() {
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <MessageSquare className="w-4 h-4" />
-                    <span className="font-medium">
+                    <span className="font-medium flex-1">
                       {session.messages[0]?.content.slice(0, 30) || "New Chat"}
                     </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-6 h-6 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-all"
+                      onClick={(e) => handleDeleteSession(session.sessionId, e)}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
                   </div>
                   <p className="line-clamp-2 text-muted-foreground">
                     {session.messages[session.messages.length - 1]?.content ||
