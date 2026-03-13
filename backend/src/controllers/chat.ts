@@ -304,3 +304,30 @@ export const getSessionHistory = async (req: Request, res: Response) => {
       res.status(500).json({ message: "Error fetching chat history" });
     }
   };
+
+  // Delete a chat session
+export const deleteChatSession = async (req: Request, res: Response) => {
+  try {
+    const { sessionId } = req.params;
+    const userId = new Types.ObjectId(req.user.id);
+
+    // Find and delete the session
+    const session = await ChatSession.findOneAndDelete({ 
+      sessionId, 
+      userId 
+    });
+
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    logger.info(`Chat session deleted: ${sessionId} by user ${userId}`);
+    res.json({ message: "Chat session deleted successfully" });
+  } catch (error) {
+    logger.error("Error deleting chat session:", error);
+    res.status(500).json({
+      message: "Error deleting chat session",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
