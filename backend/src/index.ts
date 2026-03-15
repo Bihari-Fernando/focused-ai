@@ -16,6 +16,7 @@ import { errorHandler } from './middleware/errorHandler';
 import chatRouter from "./routes/chat";
 import moodRouter from "./routes/mood";
 import activityRouter from "./routes/activity";
+import dashboardRouter from "./routes/dashboard";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use("/auth", authRoute);
 app.use("/chat", chatRouter);
 app.use('/api/mood', moodRouter);
 app.use('/api/activity', activityRouter);
+app.use('/api/dashboard', dashboardRouter);
 
 // error handling
 app.use(errorHandler);
