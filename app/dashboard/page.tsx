@@ -32,71 +32,107 @@ import { ActivityLogger } from "@/components/activities/activity-logger";
 import { useRouter } from "next/navigation";
 
 import { useSession } from "@/lib/contexts/session-context";
-import { saveMoodData } from "@/lib/static-dashboard-data";
+import { getDashboardOverview, DashboardOverview } from "@/lib/api/dashboard";
 
 export default function dashboardPage() {
-    const [currentTime, setCurrentTime] = useState(new Date())
+    const [currentTime, setCurrentTime] = useState(new Date());
     const [showMoodModal, setShowMoodModal] = useState(false);
-    const [isSavingMood, setIsSavingMood] = useState(false);
     const [showActivityLogger, setShowActivityLogger] = useState(false);
+    const [overview, setOverview] = useState<DashboardOverview | null>(null);
+    const [loadingOverview, setLoadingOverview] = useState(true);
     const { user } = useSession();
     const router = useRouter();
 
-    const wellnessStats = [
-        {
-            title: "Stress Level",
-            value: "65%",
-            icon: Brain,
-            color: "text-purple-500",
-            bgColor: "bg-purple-500/10",
-            description: "AI detected exam stress",
-        },
-        {
-            title: "Mood Score",
-            value: "72%",
-            icon: Heart,
-            color: "text-rose-500",
-            bgColor: "bg-rose-500/10",
-            description: "Today's emotional state",
-        },
-        {
-            title: "AI Check-ins",
-            value: "3",
-            icon: Activity,
-            color: "text-blue-500",
-            bgColor: "bg-blue-500/10",
-            description: "Conversations with AI today",
-        },
-        {
-            title: "Focus Sessions",
-            value: "2",
-            icon: Trophy,
-            color: "text-yellow-500",
-            bgColor: "bg-yellow-500/10",
-            description: "Study sessions completed",
-        },
-    ];
+    const wellnessStats = overview
+        ? [
+              {
+                  title: "Stress Level",
+                  value: `${overview.stressLevelPercent}%`,
+                  icon: Brain,
+                  color: "text-purple-500",
+                  bgColor: "bg-purple-500/10",
+                  description: overview.stressDescription,
+              },
+              {
+                  title: "Mood Score",
+                  value: overview.moodScore !== null ? `${overview.moodScore}%` : "—",
+                  icon: Heart,
+                  color: "text-rose-500",
+                  bgColor: "bg-rose-500/10",
+                  description: overview.emotionalState,
+              },
+              {
+                  title: "AI Check-ins",
+                  value: `${overview.aiCheckIns}`,
+                  icon: Activity,
+                  color: "text-blue-500",
+                  bgColor: "bg-blue-500/10",
+                  description: "Conversations with AI today",
+              },
+              {
+                  title: "Focus Sessions",
+                  value: `${overview.focusSessions}`,
+                  icon: Trophy,
+                  color: "text-yellow-500",
+                  bgColor: "bg-yellow-500/10",
+                  description: "Study sessions completed",
+              },
+          ]
+        : [
+              {
+                  title: "Stress Level",
+                  value: "—",
+                  icon: Brain,
+                  color: "text-purple-500",
+                  bgColor: "bg-purple-500/10",
+                  description: "AI detected exam stress",
+              },
+              {
+                  title: "Mood Score",
+                  value: "—",
+                  icon: Heart,
+                  color: "text-rose-500",
+                  bgColor: "bg-rose-500/10",
+                  description: "Today's emotional state",
+              },
+              {
+                  title: "AI Check-ins",
+                  value: "—",
+                  icon: Activity,
+                  color: "text-blue-500",
+                  bgColor: "bg-blue-500/10",
+                  description: "Conversations with AI today",
+              },
+              {
+                  title: "Focus Sessions",
+                  value: "—",
+                  icon: Trophy,
+                  color: "text-yellow-500",
+                  bgColor: "bg-yellow-500/10",
+                  description: "Study sessions completed",
+              },
+          ];
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
-    const handleMoodSubmit = async (data: { moodScore: number }) => {
-        setIsSavingMood(true);
+    const loadOverview = useCallback(async () => {
         try {
-          await saveMoodData({
-            userId: "default-user",
-            mood: data.moodScore,
-            note: "",
-          });
-          setShowMoodModal(false);
+            setLoadingOverview(true);
+            const data = await getDashboardOverview();
+            setOverview(data);
         } catch (error) {
-          console.error("Error saving mood:", error);
+            console.error("Failed to load dashboard overview:", error);
         } finally {
-          setIsSavingMood(false);
+            setLoadingOverview(false);
         }
-      };
+    }, []);
+
+    useEffect(() => {
+        loadOverview();
+    }, [loadOverview]);
 
     const handleAICheckIn = () => {
         setShowActivityLogger(true);
@@ -268,7 +304,14 @@ export default function dashboardPage() {
                                     ))}
                                 </div>
                                 <div className="mt-4 text-xs text-muted-foreground text-right">
-                                    Last updated: {format(new Date(), "h:mm a")}
+                                    {loadingOverview
+                                        ? "Loading..."
+                                        : `Last updated: ${format(
+                                              overview?.lastUpdated
+                                                  ? new Date(overview.lastUpdated)
+                                                  : new Date(),
+                                              "h:mm a"
+                                          )}`}
                                 </div>
                             </CardContent>
 
@@ -296,7 +339,12 @@ export default function dashboardPage() {
                         </DialogDescription>
                     </DialogHeader>
                     {/* moodform */}
-                    <MoodForm onSuccess={() => setShowMoodModal(false)} />
+                    <MoodForm
+                        onSuccess={() => {
+                            setShowMoodModal(false);
+                            loadOverview();
+                        }}
+                    />
                 </DialogContent>
             </Dialog>
 
