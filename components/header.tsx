@@ -51,7 +51,7 @@ export default function Header() {
                     asChild
                     className="hidden md:flex gap-2 bg-primary/90 hover:bg-primary"
                   >
-                    <Link href="/therapy/session">
+                    <Link href="/therapy/new">
                       <MessageCircle className="w-4 h-4 mr-1" />
                       Start Chat
                     </Link>
