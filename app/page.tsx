@@ -219,6 +219,25 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+       {/* Stats Section */}
+      <section className="border-y border-border bg-card/30 py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { value: "10K+", label: "Students Helped" },
+              { value: "85%", label: "Stress Reduction" },
+              { value: "24/7", label: "Availability" },
+              { value: "4.9", label: "User Rating" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-3xl font-bold text-primary sm:text-4xl">{stat.value}</div>
+                <div className="mt-1 text-sm text-muted-foreground">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
