@@ -238,6 +238,50 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* How it Works Section */}
+      <section id="how-it-works" className="py-20 sm:py-32">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Simple Steps to Calm
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Getting started with FocusedAI takes just a few moments
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {[
+              {
+                step: "01",
+                title: "Share How You Feel",
+                description: "Tell our AI about your current stress level and what's on your mind.",
+              },
+              {
+                step: "02",
+                title: "Get Personalized Support",
+                description: "Receive tailored guidance, breathing exercises, and calming techniques.",
+              },
+              {
+                step: "03",
+                title: "Feel More Focused",
+                description: "Return to your studies with renewed clarity and reduced anxiety.",
+              },
+            ].map((item, index) => (
+              <div key={item.step} className="relative">
+                <div className="mb-4 text-5xl font-bold text-primary/20">{item.step}</div>
+                <h3 className="mb-2 text-xl font-semibold">{item.title}</h3>
+                <p className="text-muted-foreground">{item.description}</p>
+                {index < 2 && (
+                  <div className="absolute top-8 right-0 hidden h-px w-full -translate-x-1/2 bg-border md:block" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
