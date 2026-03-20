@@ -7,7 +7,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
         
         <p className="text-sm text-muted-foreground text-center">
-          © 2025 FocusedAI All rights reserved.
+          © 2026 FocusedAI All rights reserved.
         </p>
 
       </div>
