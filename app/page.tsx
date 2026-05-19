@@ -170,7 +170,7 @@ export default function Home() {
             >
               <Button
                 size="lg"
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push("/login")}
                 className="relative group h-12 px-8 rounded-full bg-gradient-to-r from-primary via-primary/90 to-secondary hover:to-primary shadow-lg shadow-primary/20 transition-all duration-500 hover:shadow-xl hover:shadow-primary/30"
               >
                 <span className="relative z-10 font-medium flex items-center gap-2">
