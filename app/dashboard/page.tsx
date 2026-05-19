@@ -352,6 +352,7 @@ export default function dashboardPage() {
             <ActivityLogger
                 open={showActivityLogger}
                 onOpenChange={setShowActivityLogger}
+                onSuccess={loadOverview}
             />
 
         </div>

@@ -1,13 +1,4 @@
 import { useState } from "react";
-import {
-    Card,
-    CardAction,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
 
 import {
     Dialog,
@@ -15,19 +6,18 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/select";
+
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
 
 const activityTypes = [
@@ -44,32 +34,65 @@ interface ActivityLoggerProps {
     onOpenChange: (open: boolean) => void;
 }
 
-export function ActivityLogger({ open, onOpenChange }
-    : ActivityLoggerProps) {
+export function ActivityLogger({
+    open,
+    onOpenChange,
+}: ActivityLoggerProps) {
     const [type, setType] = useState("");
     const [name, setName] = useState("");
     const [duration, setDuration] = useState("");
     const [description, setDescription] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        setTimeout(() => {
-            console.log({
-                type,
-                name,
-                duration,
-                description,
-            });
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
+        try {
+            setIsLoading(true);
+
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(
+                "http://localhost:3001/api/activity",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        type,
+                        name,
+                        duration: Number(duration),
+                        description,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to save activity");
+            }
+
+            console.log(data);
+
+            // Reset form
             setType("");
             setName("");
             setDuration("");
             setDescription("");
-            setIsLoading(false);
 
-            alert("Activity logged (mock)!");
+            alert("Activity logged successfully!");
+
+            // Close dialog
             onOpenChange(false);
-        }, 1000);
+        } catch (error) {
+            console.error(error);
+            alert("Failed to save activity");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -77,46 +100,64 @@ export function ActivityLogger({ open, onOpenChange }
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Log Activity</DialogTitle>
-                    <DialogDescription>Record your wellness activity</DialogDescription>
 
+                    <DialogDescription>
+                        Record your wellness activity
+                    </DialogDescription>
                 </DialogHeader>
-                <form action='' onSubmit={handleSubmit}>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Activity Type */}
                     <div className="space-y-2">
                         <Label>Activity Type</Label>
+
                         <Select value={type} onValueChange={setType}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select activity type" />
                             </SelectTrigger>
+
                             <SelectContent>
-                                {activityTypes.map((type) => (
-                                    <SelectItem key={type.id} value={type.id}>
-                                        {type.name}
+                                {activityTypes.map((activity) => (
+                                    <SelectItem
+                                        key={activity.id}
+                                        value={activity.id}
+                                    >
+                                        {activity.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     </div>
+
+                    {/* Name */}
                     <div className="space-y-2">
                         <Label>Name</Label>
+
                         <Input
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="Breathing Session, Focus Game, Confidence Practice, etc."
+                            placeholder="Breathing Session, Focus Game, etc."
+                            required
                         />
                     </div>
 
+                    {/* Duration */}
                     <div className="space-y-2">
                         <Label>Duration (minutes)</Label>
+
                         <Input
                             type="number"
                             value={duration}
                             onChange={(e) => setDuration(e.target.value)}
                             placeholder="15"
+                            min="1"
                         />
                     </div>
 
+                    {/* Description */}
                     <div className="space-y-2">
                         <Label>Description (optional)</Label>
+
                         <Input
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -124,18 +165,26 @@ export function ActivityLogger({ open, onOpenChange }
                         />
                     </div>
 
-                    <div className="flex justify-end gap-2">
+                    {/* Buttons */}
+                    <div className="flex justify-end gap-2 pt-2">
                         <Button
                             type="button"
                             variant="ghost"
+                            onClick={() => onOpenChange(false)}
+                            disabled={isLoading}
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" disabled>Save Activity</Button>
+
+                        <Button
+                            type="submit"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "Saving..." : "Save Activity"}
+                        </Button>
                     </div>
                 </form>
             </DialogContent>
         </Dialog>
     );
 }
-

@@ -102,10 +102,17 @@ export const getDashboardOverview = async (req: Request, res: Response) => {
 
     // Focus sessions: activities of type focus-training today
     const focusSessions = await Activity.countDocuments({
-      userId,
-      type: "focus-training",
-      timestamp: { $gte: startOfDay, $lt: endOfDay },
-    });
+  userId,
+  type: {
+    $in: [
+      "focus-training",
+      "breathing",
+      "mindfulness",
+      "stress-reset",
+    ],
+  },
+  timestamp: { $gte: startOfDay, $lt: endOfDay },
+});
 
     // Study sessions completed: chat sessions marked completed today
     const studySessionsCompleted = await ChatSession.countDocuments({

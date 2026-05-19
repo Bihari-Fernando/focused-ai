@@ -10,4 +10,4 @@ router.use(auth);
 // Log a new activity
 router.post("/", logActivity);
 
-export default router;
+export default router;''
