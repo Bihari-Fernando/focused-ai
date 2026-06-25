@@ -7,6 +7,8 @@ import { Types } from "mongoose";
 import { GoogleGenAI } from "@google/genai";
 import {  InngestEvent, InngestSessionResponse } from "../types/inngest";
 import { ChatSession, IChatSession } from "../models/ChatSession";
+import { Mood } from "../models/mood";       
+import { Activity } from "../models/Activity"; 
 import dotenv from "dotenv";
 
 const ai = new GoogleGenAI({
@@ -83,159 +85,194 @@ export const getAllChatSessions = async (req: Request, res: Response) => {
   }
 };
 
- // Send a message in the chat session
+
 export const sendMessage = async (req: Request, res: Response) => {
-    try {
-      const { sessionId } = req.params;
-      const { message } = req.body;
-      const userId = new Types.ObjectId(req.user.id);
-  
-      logger.info("Processing wellness message:", { sessionId, message });
-  
-      // Find session
-      const session = await ChatSession.findOne({ sessionId });
-      if (!session) {
-        logger.warn("Session not found:", { sessionId });
-        return res.status(404).json({ message: "Session not found" });
-      }
-  
-      if (session.userId.toString() !== userId.toString()) {
-        logger.warn("Unauthorized access attempt:", { sessionId, userId });
-        return res.status(403).json({ message: "Unauthorized" });
-      }
-  
-      // Create Inngest event
-      const event: InngestEvent = {
-        name: "therapy/session.message", 
-        data: {
-          message,
-          history: session.messages,
-          memory: {
-            userProfile: {
-              stressLevel: "moderate",
-              focusLevel: "average",
-              confidenceLevel: "stable",
-              preferences: {},
-            },
-            sessionContext: {
-              recentActivities: [],
-              currentActivity: null,
-            },
-          },
-          goals: [],
+  try {
+    const { sessionId } = req.params;
+    const { message } = req.body;
+    const userId = new Types.ObjectId(req.user._id);
+
+    if (!message || message.trim().length < 3) {
+      return res.json({
+        response: "I'm here to support you. Could you share more about what you are feeling or what kind of support you need?",
+        analysis: {
+          intent: "unclear",
+          emotionalState: "unknown",
+          stressLevel: "low",
+          focusLevel: "average",
+          confidenceLevel: "stable",
+          recommendedActivity: "mindfulness",
         },
-      };
-  
-      logger.info("Sending wellness event to Inngest:", { event });
-  
-      // Fire-and-forget Inngest event; don't block or fail the main chat flow
-      try {
-        await inngest.send(event);
-      } catch (inngestError) {
-        logger.error("Failed to send Inngest event (non-fatal):", inngestError);
-      }
-  
-      const analysisPrompt = `
-  Analyze this student wellness message and return ONLY valid JSON.
-  
-  Message: ${message}
-  
-  Required JSON structure:
-  {
-    "emotionalState": "string",
-    "stressLevel": "low | moderate | high",
-    "focusLevel": "low | average | high",
-    "confidenceLevel": "low | stable | high",
-    "recommendedActivity": "breathing | focus-game | confidence-builder | stress-reset | mindfulness",
-    "encouragementMessage": "string"
-  }
-  `;
-  
-      const analysisResult = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: analysisPrompt,
-      });
-      const analysisText = analysisResult.text?.trim() || "";
-      const cleanAnalysisText = analysisText.replace(/```json|```/g, "").trim();
-      const analysis = JSON.parse(cleanAnalysisText);
-  
-      logger.info("Wellness analysis:", analysis);
-  
-     
-      //  Generate Wellness Response
-      
-      const responsePrompt = `
-  You are an AI Wellness Coach for students.
-  
-  Based on the message and analysis below, generate a supportive and motivating response.
-  
-  Message: ${message}
-  Analysis: ${JSON.stringify(analysis)}
-  
-  Guidelines:
-  1. Acknowledge emotional state
-  2. Suggest a helpful activity (breathing, focus-game, confidence-builder, stress-reset, mindfulness)
-  3. Encourage positive action
-  4. Keep tone calm, supportive, and practical
-  5. Do NOT use therapy or clinical language
-  `;
-  
-      const responseResult = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: responsePrompt,
-      });
-      const response = responseResult.text?.trim() || "";
-  
-      logger.info("Generated wellness response:", response);
-  
-      // Save to Session
-      
-      session.messages.push({
-        role: "user",
-        content: message,
-        timestamp: new Date(),
-      });
-  
-      session.messages.push({
-        role: "assistant",
-        content: response,
-        timestamp: new Date(),
-        metadata: {
-          analysis,
-          wellnessProgress: {
-            stressLevel: analysis.stressLevel,
-            focusLevel: analysis.focusLevel,
-            confidenceLevel: analysis.confidenceLevel,
-          },
-        },
-      });
-  
-      await session.save();
-      logger.info("Session updated successfully:", { sessionId });
-  
-      // Return Response
-      
-      res.json({
-        response,
-        analysis,
-        metadata: {
-          wellnessProgress: {
-            stressLevel: analysis.stressLevel,
-            focusLevel: analysis.focusLevel,
-            confidenceLevel: analysis.confidenceLevel,
-          },
-        },
-      });
-  
-    } catch (error) {
-      logger.error("Error in sendMessage:", error);
-  
-      res.status(500).json({
-        message: "Error processing message",
-        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
-  };
+
+    const session = await ChatSession.findOne({ sessionId });
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+    if (session.userId.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // ✅ STEP 1: Fetch user's recent mood & activity data
+    const since = new Date();
+    since.setDate(since.getDate() - 7);
+
+    const [recentMoods, recentActivities] = await Promise.all([
+      Mood.find({ userId, timestamp: { $gte: since } })
+        .sort({ timestamp: -1 })
+        .limit(5)
+        .lean(),
+      Activity.find({ userId, timestamp: { $gte: since } })
+        .sort({ timestamp: -1 })
+        .limit(5)
+        .lean(),
+    ]);
+
+    // ✅ STEP 2: Build a readable user context from that data
+    const avgMoodScore =
+      recentMoods.length > 0
+        ? (recentMoods.reduce((sum, m) => sum + m.score, 0) / recentMoods.length).toFixed(1)
+        : null;
+
+    const moodContext =
+      recentMoods.length > 0
+        ? recentMoods
+            .map((m) => `- Score: ${m.score}/100, Note: "${m.note ?? "none"}", Date: ${new Date(m.timestamp).toLocaleDateString()}`)
+            .join("\n")
+        : "No mood data logged this week.";
+
+    const activityContext =
+      recentActivities.length > 0
+        ? recentActivities
+            .map((a) => `- ${a.name} (${a.type}), Duration: ${a.duration ?? "?"}min, Date: ${new Date(a.timestamp).toLocaleDateString()}`)
+            .join("\n")
+        : "No activities logged this week.";
+
+    // ✅ STEP 3: Analysis prompt now includes user context
+    const analysisPrompt = `
+You are analyzing messages for Focused-AI, a student wellness assistant.
+
+Here is what you know about this student from their tracked data this week:
+- Average mood score: ${avgMoodScore ?? "unknown"}/100
+- Recent moods:
+${moodContext}
+- Recent activities:
+${activityContext}
+
+Now analyze their current message with this context in mind.
+
+Student message:
+"""
+${message}
+"""
+
+Return ONLY valid JSON:
+{
+  "intent": "stress | motivation | productivity | focus | work-life-balance | unclear",
+  "emotionalState": "string",
+  "stressLevel": "low | moderate | high",
+  "focusLevel": "low | average | high",
+  "confidenceLevel": "low | stable | high",
+  "recommendedActivity": "breathing | focus-game | confidence-builder | stress-reset | mindfulness",
+  "encouragementMessage": "string"
+}
+`;
+
+    const analysisResult = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: analysisPrompt,
+    });
+
+    const analysisText = analysisResult.text?.trim() ?? "";
+    const analysis = JSON.parse(analysisText.replace(/```json|```/g, "").trim());
+
+    // ✅ STEP 4: Response prompt is fully personalized
+    const responsePrompt = `
+You are Focused-AI, a student wellness assistant.
+
+You know the following about this student from their tracked data this week:
+- Average mood score: ${avgMoodScore ?? "unknown"}/100
+- Recent moods:
+${moodContext}
+- Recent activities:
+${activityContext}
+
+Use this context to give a personalized, relevant response. For example:
+- If their mood has been dropping, acknowledge it.
+- If they've been doing breathing exercises, reference that progress.
+- If they haven't logged any activities, gently suggest one.
+
+Student's current message:
+"""
+${message}
+"""
+
+Analysis of their message:
+${JSON.stringify(analysis)}
+
+Rules:
+1. The student's MESSAGE is the primary signal. Mood data is only background context.
+2. Only reference mood scores if it's genuinely relevant to what they said.
+3. Don't be generic. A student with score 30/100 needs different support than one at 80/100.
+4. Keep tone warm, practical, and student-friendly.
+5. No clinical or therapy language.
+6. Keep response under 120 words.
+7. If intent is "unclear" (gibberish, random letters, very short meaningless text):
+   ONLY ask ONE simple clarifying question like "Hey, are you okay? What's on your mind?"
+   Do NOT reference mood scores or activities for unclear messages.
+   Do NOT assume they are struggling.
+`;
+
+    const responseResult = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: responsePrompt,
+    });
+
+    const response = responseResult.text?.trim() ?? "";
+
+    // Save messages
+    session.messages.push({ role: "user", content: message, timestamp: new Date() });
+    session.messages.push({
+      role: "assistant",
+      content: response,
+      timestamp: new Date(),
+      metadata: {
+        analysis,
+        wellnessProgress: {
+          stressLevel: analysis.stressLevel,
+          focusLevel: analysis.focusLevel,
+          confidenceLevel: analysis.confidenceLevel,
+        },
+      },
+    });
+
+    await session.save();
+
+    res.json({
+      response,
+      analysis,
+      metadata: {
+        wellnessProgress: {
+          stressLevel: analysis.stressLevel,
+          focusLevel: analysis.focusLevel,
+          confidenceLevel: analysis.confidenceLevel,
+        },
+        moodContext: {
+          avgMoodScore: avgMoodScore ? parseFloat(avgMoodScore) : null,
+          dataPoints: recentMoods.length,
+        },
+      },
+    });
+  } catch (error) {
+    logger.error("Error in sendMessage:", error);
+    res.status(500).json({
+      message: "Error processing message",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
   
 
   // Get chat session history
